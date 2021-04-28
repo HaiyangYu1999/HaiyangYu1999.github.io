@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Grandstander:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="简介本文用AStar算法实现了关于8数码问题(也可以是n数码问题,  n &#x3D; i^2 - 1, i &#x3D; 2,3,…). 关于8数码问题和AStar算法的描述参见网络.  这里仅给出java 实现.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="n数码问题的A*算法(java实现)">
+<meta property="og:url" content="https://yoursite/2020/10/04/ML/AStarAlgorithm/index.html">
+<meta property="og:site_name" content="Haiyang Yu&#39;s Blog">
+<meta property="og:description" content="简介本文用AStar算法实现了关于8数码问题(也可以是n数码问题,  n &#x3D; i^2 - 1, i &#x3D; 2,3,…). 关于8数码问题和AStar算法的描述参见网络.  这里仅给出java 实现.">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-10-04T04:11:28.000Z">
+<meta property="article:modified_time" content="2020-10-07T09:13:54.393Z">
+<meta property="article:author" content="Haiyang Yu">
+<meta property="article:tag" content="Machine Learning">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://yoursite/2020/10/04/ML/AStarAlgorithm/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>n数码问题的A*算法(java实现) | Haiyang Yu's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Haiyang Yu's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Haiyang Yu's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/HaiyangYu1999" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://yoursite/2020/10/04/ML/AStarAlgorithm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Haiyang Yu">
+      <meta itemprop="description" content="Be Curious about Everything">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Haiyang Yu's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          n数码问题的A*算法(java实现)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-04 12:11:28" itemprop="dateCreated datePublished" datetime="2020-10-04T12:11:28+08:00">2020-10-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-10-07 17:13:54" itemprop="dateModified" datetime="2020-10-07T17:13:54+08:00">2020-10-07</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Machine-Learning/" itemprop="url" rel="index"><span itemprop="name">Machine Learning</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/10/04/ML/AStarAlgorithm/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/10/04/ML/AStarAlgorithm/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>15k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>13 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>本文用AStar算法实现了关于8数码问题(也可以是n数码问题,  n = i^2 - 1, i = 2,3,…). 关于8数码问题和AStar算法的描述参见网络.  这里仅给出java 实现.</p>
+<a id="more"></a>
+
+<h2 id="h函数的定义"><a href="#h函数的定义" class="headerlink" title="h函数的定义"></a>h函数的定义</h2><blockquote>
+<p><strong>当前</strong> 状态的 n*n 矩阵与 <strong>目标</strong> 状态的 n*n 矩阵中不同数字的个数即为<code>h</code></p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">distanceTo</span><span class="params">(Grid to)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(to.grid.length != <span class="keyword">this</span>.grid.length)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">&quot;ArraySize not Match!&quot;</span>);</span><br><span class="line">        <span class="keyword">int</span> dist = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.grid.length; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(<span class="keyword">this</span>.grid[i] != to.grid[i])</span><br><span class="line">                ++dist;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dist;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="基本类型Grid的定义"><a href="#基本类型Grid的定义" class="headerlink" title="基本类型Grid的定义"></a>基本类型Grid的定义</h2><p>Grid类中储存了矩阵的元素信息, 并且实现了判断两个矩阵的曼哈顿距离的distanceTo()方法和向四周移动元素0的方法expands(), 重写了equals, hashCode, toString方法.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> AIHomework;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"><span class="keyword">import</span> java.util.Collections;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span> 定义储存二维数组的基本类型Grid</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Haiyang Yu</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Grid</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[] grid;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> N;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Grid</span><span class="params">(<span class="keyword">int</span>[][] grid)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(grid == <span class="keyword">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException(<span class="string">&quot;grid is NULL!&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span>[] ints : grid) &#123;</span><br><span class="line">            <span class="keyword">if</span> (ints.length != grid.length)</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ExceptionInInitializerError(<span class="string">&quot;grid must be a square array!&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        N = grid.length;</span><br><span class="line">        <span class="keyword">int</span> size = grid.length * grid[<span class="number">0</span>].length;</span><br><span class="line">        <span class="keyword">this</span>.grid = <span class="keyword">new</span> <span class="keyword">int</span>[size];</span><br><span class="line">        <span class="keyword">int</span> k = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span>[] i : grid)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j : i)</span><br><span class="line">                <span class="keyword">this</span>.grid[k++] = j;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Grid</span><span class="params">(<span class="keyword">int</span>[] grid)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> len = grid.length;</span><br><span class="line">        <span class="keyword">if</span>((<span class="keyword">int</span>) Math.sqrt(len) * (<span class="keyword">int</span>) Math.sqrt(len) != len)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ExceptionInInitializerError(<span class="string">&quot;grid must be a square array!&quot;</span>);</span><br><span class="line">        N = (<span class="keyword">int</span>) Math.sqrt(len);</span><br><span class="line">        <span class="keyword">this</span>.grid = Arrays.copyOf(grid,grid.length);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Grid</span><span class="params">(Grid other)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.grid = Arrays.copyOf(other.grid, other.grid.length);</span><br><span class="line">        <span class="keyword">this</span>.N = other.N;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">distanceTo</span><span class="params">(Grid to)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(to.grid.length != <span class="keyword">this</span>.grid.length)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">&quot;ArraySize not Match!&quot;</span>);</span><br><span class="line">        <span class="keyword">int</span> dist = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.grid.length; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(<span class="keyword">this</span>.grid[i] != to.grid[i])</span><br><span class="line">                ++dist;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dist;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">find0</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;grid.length; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(grid[i] == <span class="number">0</span>)</span><br><span class="line">                <span class="keyword">return</span> i;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">&quot;0 not found!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Grid&gt; <span class="title">expands</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> loc0 = find0();</span><br><span class="line">        List&lt;Grid&gt; ans = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">if</span>(loc0 &gt;= N)  <span class="comment">//move up</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">int</span>[] tmparr = Arrays.copyOf(grid, grid.length);</span><br><span class="line">            <span class="keyword">int</span> tmp = tmparr[loc0];</span><br><span class="line">            tmparr[loc0] = tmparr[loc0 - N];</span><br><span class="line">            tmparr[loc0 - N] = tmp;</span><br><span class="line">            ans.add(<span class="keyword">new</span> Grid(tmparr));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(loc0 &lt; grid.length - N) <span class="comment">// move down</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">int</span>[] tmparr = Arrays.copyOf(grid, grid.length);</span><br><span class="line">            <span class="keyword">int</span> tmp = tmparr[loc0];</span><br><span class="line">            tmparr[loc0] = tmparr[loc0 + N];</span><br><span class="line">            tmparr[loc0 + N] = tmp;</span><br><span class="line">            ans.add(<span class="keyword">new</span> Grid(tmparr));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(loc0 % N != <span class="number">0</span>) <span class="comment">//move left</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">int</span>[] tmparr = Arrays.copyOf(grid, grid.length);</span><br><span class="line">            <span class="keyword">int</span> tmp = tmparr[loc0];</span><br><span class="line">            tmparr[loc0] = tmparr[loc0 - <span class="number">1</span>];</span><br><span class="line">            tmparr[loc0 - <span class="number">1</span>] = tmp;</span><br><span class="line">            ans.add(<span class="keyword">new</span> Grid(tmparr));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(loc0 % N != N-<span class="number">1</span>) <span class="comment">//move right</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">int</span>[] tmparr = Arrays.copyOf(grid, grid.length);</span><br><span class="line">            <span class="keyword">int</span> tmp = tmparr[loc0];</span><br><span class="line">            tmparr[loc0] = tmparr[loc0 + <span class="number">1</span>];</span><br><span class="line">            tmparr[loc0 + <span class="number">1</span>] = tmp;</span><br><span class="line">            ans.add(<span class="keyword">new</span> Grid(tmparr));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object other)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(other <span class="keyword">instanceof</span> Grid)</span><br><span class="line">        &#123;</span><br><span class="line">            Grid o = (Grid) other;</span><br><span class="line">            <span class="keyword">if</span>(o.grid.length != <span class="keyword">this</span>.grid.length)</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.grid.length; ++i) &#123;</span><br><span class="line">                    <span class="keyword">if</span>(o.grid[i] != <span class="keyword">this</span>.grid[i])</span><br><span class="line">                        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> a = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> base = <span class="number">31</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i : grid)</span><br><span class="line">        &#123;</span><br><span class="line">            a += i;</span><br><span class="line">            a *= base;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> a;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        StringBuilder s = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">        <span class="keyword">int</span> max = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i : <span class="keyword">this</span>.grid)</span><br><span class="line">            <span class="keyword">if</span>(i &gt; max)</span><br><span class="line">                max = i;</span><br><span class="line">        <span class="keyword">int</span> subsize = (<span class="keyword">int</span>) Math.sqrt(grid.length);</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; grid.length; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(i % subsize == <span class="number">0</span> &amp;&amp; i != <span class="number">0</span>)</span><br><span class="line">                s.append(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">            <span class="keyword">if</span>(max &gt; <span class="number">9</span> &amp;&amp; grid[i] &lt; <span class="number">10</span>)</span><br><span class="line">                s.append(<span class="string">&#x27; &#x27;</span>);</span><br><span class="line">            s.append(grid[i]);</span><br><span class="line">            s.append(<span class="string">&#x27; &#x27;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> s.toString();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] a = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">0</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">3</span>,<span class="number">8</span>&#125;;</span><br><span class="line">        Grid ga = <span class="keyword">new</span> Grid(a);</span><br><span class="line">        <span class="keyword">int</span>[][] b = &#123;&#123;<span class="number">2</span>,<span class="number">8</span>,<span class="number">3</span>&#125;,</span><br><span class="line">                &#123;<span class="number">1</span>,<span class="number">0</span>,<span class="number">4</span>&#125;,</span><br><span class="line">                &#123;<span class="number">7</span>,<span class="number">6</span>,<span class="number">5</span>&#125;&#125;;</span><br><span class="line">        Grid gb = <span class="keyword">new</span> Grid(b);</span><br><span class="line">        <span class="keyword">for</span>(Grid g : ga.expands())</span><br><span class="line">            System.out.println(g);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="状态节点类型State的定义"><a href="#状态节点类型State的定义" class="headerlink" title="状态节点类型State的定义"></a>状态节点类型State的定义</h2><p>State是节点类, 描述某个节点含有的grid, 最终状态的目标grid, 以及节点是从哪个父节点移动得来的.</p>
+<p>同时, 计算了H, G, F的值. 并且可以通过调用aStar方法来执行A*算法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> AIHomework;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.Collections;</span><br><span class="line"><span class="keyword">import</span> java.util.LinkedList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span> 节点类, 描述某个节点含有的grid, 最终的目标grid, 以及节点是从哪个父节点移动得来的.</span></span><br><span class="line"><span class="comment"> * 同时, 计算了H, G, F的值. 并且可以通过调用aStar方法来执行A*算法</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Haiyang Yu</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> Grid</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">State</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> Grid curr;</span><br><span class="line">    <span class="keyword">public</span> Grid finalState;</span><br><span class="line">    <span class="keyword">public</span> State prev = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> H;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> G;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> F;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> maxIteration;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">State</span><span class="params">(Grid currState, Grid finalState, State prev, <span class="keyword">int</span> maxIteration)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.maxIteration = maxIteration;</span><br><span class="line">        <span class="keyword">this</span>.curr = currState;</span><br><span class="line">        <span class="keyword">this</span>.prev = prev;</span><br><span class="line">        <span class="keyword">this</span>.finalState = finalState;</span><br><span class="line">        H = currState.distanceTo(finalState);</span><br><span class="line">        <span class="keyword">if</span>(prev == <span class="keyword">null</span>)</span><br><span class="line">            G = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            G = prev.G + <span class="number">1</span>;</span><br><span class="line">        F = G + H;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">State</span><span class="params">(Grid currState, Grid finalState, State prev)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>(currState, finalState, prev, <span class="number">1</span> &lt;&lt; <span class="number">16</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">State</span><span class="params">(Grid currState, Grid finalState)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>(currState,finalState, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;State&gt; <span class="title">expands</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        List&lt;State&gt; states = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span>(Grid grid : curr.expands())</span><br><span class="line">        &#123;</span><br><span class="line">            states.add(<span class="keyword">new</span> State(grid, finalState, <span class="keyword">this</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> states;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object other)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(other <span class="keyword">instanceof</span> State)</span><br><span class="line">        &#123;</span><br><span class="line">            State o = (State) other;</span><br><span class="line">            <span class="keyword">return</span> o.curr.equals(<span class="keyword">this</span>.curr);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> curr.hashCode();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> curr.toString() + <span class="string">&quot;\n&quot;</span> + <span class="string">&quot;F: &quot;</span> + F + <span class="string">&quot; H: &quot;</span> + H + <span class="string">&quot; G: &quot;</span> + G;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@Description</span> 算法参考于https://www.cnblogs.com/roadwide/p/12890295.html</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">aStar</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        List&lt;State&gt; open = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        List&lt;State&gt; closed = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        open.add(<span class="keyword">this</span>);</span><br><span class="line">        <span class="keyword">int</span> iteration = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(!open.isEmpty())</span><br><span class="line">        &#123;</span><br><span class="line">            ++iteration;</span><br><span class="line">            <span class="keyword">if</span>(iteration == maxIteration)</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">&quot;Iteration times reached &quot;</span> + maxIteration + <span class="string">&quot;. This state maybe doesn&#x27;t have a solution!&quot;</span>);</span><br><span class="line">            <span class="keyword">if</span>(iteration % <span class="number">1000</span> == <span class="number">0</span>)</span><br><span class="line">                System.out.println(<span class="string">&quot;Iteration times: &quot;</span> + iteration);</span><br><span class="line">            open.sort((State a, State b) -&gt; &#123;<span class="keyword">return</span> a.F - b.F;&#125;);</span><br><span class="line">            State minFState = open.get(<span class="number">0</span>);</span><br><span class="line">            <span class="keyword">if</span>(minFState.H == <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                minFState.tracePrint();</span><br><span class="line">                System.out.println(<span class="string">&quot;Process finished with &quot;</span> + iteration + <span class="string">&quot; times iteration.&quot;</span>);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            open.remove(<span class="number">0</span>);</span><br><span class="line">            closed.add(minFState);</span><br><span class="line"></span><br><span class="line">            List&lt;State&gt; expandStates = minFState.expands();</span><br><span class="line">            <span class="keyword">for</span>(State state : expandStates)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">boolean</span> doesClosedContainState = <span class="keyword">false</span>;</span><br><span class="line">                <span class="keyword">for</span>(State closedState : closed)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">if</span>(closedState.equals(state)) &#123;</span><br><span class="line">                        doesClosedContainState = <span class="keyword">true</span>;</span><br><span class="line">                        <span class="keyword">if</span>(state.G &lt; closedState.G) &#123;</span><br><span class="line">                            closedState = state;</span><br><span class="line">                            open.add(state);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">boolean</span> doesOpenContainState = <span class="keyword">false</span>;</span><br><span class="line">                <span class="keyword">for</span>(State openState : open) &#123;</span><br><span class="line">                    <span class="keyword">if</span>(openState.equals(state))&#123;</span><br><span class="line">                        doesOpenContainState = <span class="keyword">true</span>;</span><br><span class="line">                        <span class="keyword">if</span>(state.G &lt; openState.G)</span><br><span class="line">                        &#123;</span><br><span class="line">                            openState = state;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span>(!doesOpenContainState &amp;&amp; !doesClosedContainState)</span><br><span class="line">                    open.add(state);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">tracePrint</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        List&lt;State&gt; ans = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        State state = <span class="keyword">this</span>;</span><br><span class="line">        <span class="keyword">while</span>(state != <span class="keyword">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            ans.add(state);</span><br><span class="line">            state = state.prev;</span><br><span class="line">        &#125;</span><br><span class="line">        Collections.reverse(ans);</span><br><span class="line">        <span class="keyword">for</span>(State i : ans)</span><br><span class="line">        &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;-------------&quot;</span>);</span><br><span class="line">            System.out.println(i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] a = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">0</span>&#125;;</span><br><span class="line">        Grid ga = <span class="keyword">new</span> Grid(a);</span><br><span class="line">        <span class="keyword">int</span>[][] b = &#123;&#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;,</span><br><span class="line">                    &#123;<span class="number">4</span>,<span class="number">0</span>,<span class="number">8</span>&#125;,</span><br><span class="line">                    &#123;<span class="number">7</span>,<span class="number">6</span>,<span class="number">5</span>&#125;&#125;;</span><br><span class="line">        Grid gb = <span class="keyword">new</span> Grid(b);</span><br><span class="line">        State state = <span class="keyword">new</span> State(gb,ga);</span><br><span class="line">        state.aStar();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="构造测试样例的辅助类"><a href="#构造测试样例的辅助类" class="headerlink" title="构造测试样例的辅助类"></a>构造测试样例的辅助类</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> AIHomework;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Random;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span> 由于n数码问题不是一定有解的. 当二维数组的size升高时, 随机生成一个 0 - 15的矩阵或者随机生成一个 0 - 24的矩阵很可能导致问题无解,</span></span><br><span class="line"><span class="comment"> * 这里的无解定义为A*算法迭代次数多于65536次. 参考State类中的aStar()方法.</span></span><br><span class="line"><span class="comment"> * 所以特意编写此类, 通过最终矩阵随机转移n次元素0, 保证生成的矩阵到最终矩阵是可以通过有限次转移得到, 即n数码问题问题有解</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Haiyang Yu</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GridGenerationFromFinalGrid</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Grid <span class="title">getNewGrid</span><span class="params">(Grid finalGrid, <span class="keyword">int</span> moveTimes, <span class="keyword">long</span> seed)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Grid ans = <span class="keyword">new</span> Grid(finalGrid);</span><br><span class="line">        Random r = <span class="keyword">new</span> Random(seed);</span><br><span class="line">        <span class="keyword">while</span>(moveTimes &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            List&lt;Grid&gt; grids = ans.expands();</span><br><span class="line">            <span class="keyword">int</span> i = r.nextInt(grids.size());</span><br><span class="line">            ans = grids.get(i);</span><br><span class="line">            --moveTimes;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Grid <span class="title">getNewGrid</span><span class="params">(Grid finalGrid, <span class="keyword">int</span> moveTimes)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getNewGrid(finalGrid, moveTimes, <span class="number">2020103732L</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Grid <span class="title">getNewGrid</span><span class="params">(Grid finalGrid)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getNewGrid(finalGrid, <span class="number">47</span>, <span class="number">2020103732L</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] finalArray3 = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>,<span class="number">11</span>,<span class="number">12</span>,<span class="number">13</span>,<span class="number">14</span>,<span class="number">15</span>,<span class="number">16</span>,<span class="number">17</span>,<span class="number">18</span>,<span class="number">19</span>,<span class="number">20</span>,<span class="number">21</span>,<span class="number">22</span>,<span class="number">23</span>,<span class="number">24</span>,<span class="number">0</span>&#125;;</span><br><span class="line">        Grid finalGrid = <span class="keyword">new</span> Grid(finalArray3);</span><br><span class="line">        <span class="keyword">int</span>[] a = GridGenerationFromFinalGrid.getNewGrid(finalGrid).grid;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i : a)</span><br><span class="line">            System.out.print(i + <span class="string">&quot;,&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="调用A-算法的主函数类"><a href="#调用A-算法的主函数类" class="headerlink" title="调用A*算法的主函数类"></a>调用A*算法的主函数类</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> AIHomework;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AStarMain</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span>[][] array1 =  &#123;&#123;<span class="number">5</span>,<span class="number">3</span>,<span class="number">6</span>&#125;,</span><br><span class="line">                                            &#123;<span class="number">1</span>,<span class="number">8</span>,<span class="number">4</span>&#125;,</span><br><span class="line">                                            &#123;<span class="number">7</span>,<span class="number">2</span>,<span class="number">0</span>&#125;&#125;;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span>[][] array2 =  &#123;&#123;<span class="number">0</span>,<span class="number">6</span>,<span class="number">2</span>,<span class="number">3</span>&#125;,</span><br><span class="line">                                            &#123;<span class="number">1</span>,<span class="number">7</span>,<span class="number">12</span>,<span class="number">11</span>&#125;,</span><br><span class="line">                                            &#123;<span class="number">5</span>,<span class="number">9</span>,<span class="number">10</span>,<span class="number">4</span>&#125;,</span><br><span class="line">                                            &#123;<span class="number">13</span>,<span class="number">14</span>,<span class="number">8</span>,<span class="number">15</span>&#125;&#125;;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span>[][] array3 =  &#123;&#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">9</span>&#125;,</span><br><span class="line">                                            &#123;<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">4</span>,<span class="number">10</span>&#125;,</span><br><span class="line">                                            &#123;<span class="number">11</span>,<span class="number">12</span>,<span class="number">13</span>,<span class="number">19</span>,<span class="number">14</span>&#125;,</span><br><span class="line">                                            &#123;<span class="number">0</span>,<span class="number">17</span>,<span class="number">21</span>,<span class="number">18</span>,<span class="number">15</span>&#125;,</span><br><span class="line">                                            &#123;<span class="number">16</span>,<span class="number">22</span>,<span class="number">23</span>,<span class="number">24</span>,<span class="number">20</span>&#125;&#125;;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span>[] finalArray1 = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">0</span>&#125;;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span>[] finalArray2 = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>,<span class="number">11</span>,<span class="number">12</span>,<span class="number">13</span>,<span class="number">14</span>,<span class="number">15</span>,<span class="number">0</span>&#125;;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span>[] finalArray3 = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>,<span class="number">11</span>,<span class="number">12</span>,<span class="number">13</span>,<span class="number">14</span>,<span class="number">15</span>,<span class="number">16</span>,<span class="number">17</span>,<span class="number">18</span>,<span class="number">19</span>,<span class="number">20</span>,<span class="number">21</span>,<span class="number">22</span>,<span class="number">23</span>,<span class="number">24</span>,<span class="number">0</span>&#125;;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        State state1 = <span class="keyword">new</span> State(<span class="keyword">new</span> Grid(array1), <span class="keyword">new</span> Grid(finalArray1));</span><br><span class="line">        state1.aStar();</span><br><span class="line">        State state2 = <span class="keyword">new</span> State(<span class="keyword">new</span> Grid(array2), <span class="keyword">new</span> Grid(finalArray2));</span><br><span class="line">        state2.aStar();</span><br><span class="line">        State state3 = <span class="keyword">new</span> State(<span class="keyword">new</span> Grid(array3), <span class="keyword">new</span> Grid(finalArray3));</span><br><span class="line">        state3.aStar();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="示例1-3-3"><a href="#示例1-3-3" class="headerlink" title="示例1 (3*3)"></a>示例1 (3*3)</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;5,3,6&#125;,                       1 2 3</span><br><span class="line">&#123;1,8,4&#125;,          &#x3D;&gt;            4 5 6</span><br><span class="line">&#123;7,2,0&#125;&#125;;                       7 8 0</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line">-------------</span><br><span class="line">5 3 6 </span><br><span class="line">1 8 4 </span><br><span class="line">7 2 0 </span><br><span class="line">F: 7 H: 7 G: 0</span><br><span class="line">-------------</span><br><span class="line">5 3 6 </span><br><span class="line">1 8 4 </span><br><span class="line">7 0 2 </span><br><span class="line">F: 9 H: 8 G: 1</span><br><span class="line">-------------</span><br><span class="line">5 3 6 </span><br><span class="line">1 0 4 </span><br><span class="line">7 8 2 </span><br><span class="line">F: 9 H: 7 G: 2</span><br><span class="line">-------------</span><br><span class="line">5 3 6 </span><br><span class="line">1 4 0 </span><br><span class="line">7 8 2 </span><br><span class="line">F: 10 H: 7 G: 3</span><br><span class="line">-------------</span><br><span class="line">5 3 0 </span><br><span class="line">1 4 6 </span><br><span class="line">7 8 2 </span><br><span class="line">F: 10 H: 6 G: 4</span><br><span class="line">-------------</span><br><span class="line">5 0 3 </span><br><span class="line">1 4 6 </span><br><span class="line">7 8 2 </span><br><span class="line">F: 10 H: 5 G: 5</span><br><span class="line">-------------</span><br><span class="line">0 5 3 </span><br><span class="line">1 4 6 </span><br><span class="line">7 8 2 </span><br><span class="line">F: 11 H: 5 G: 6</span><br><span class="line">-------------</span><br><span class="line">1 5 3 </span><br><span class="line">0 4 6 </span><br><span class="line">7 8 2 </span><br><span class="line">F: 11 H: 4 G: 7</span><br><span class="line">-------------</span><br><span class="line">1 5 3 </span><br><span class="line">4 0 6 </span><br><span class="line">7 8 2 </span><br><span class="line">F: 11 H: 3 G: 8</span><br><span class="line">-------------</span><br><span class="line">1 0 3 </span><br><span class="line">4 5 6 </span><br><span class="line">7 8 2 </span><br><span class="line">F: 11 H: 2 G: 9</span><br><span class="line">-------------</span><br><span class="line">1 3 0 </span><br><span class="line">4 5 6 </span><br><span class="line">7 8 2 </span><br><span class="line">F: 13 H: 3 G: 10</span><br><span class="line">-------------</span><br><span class="line">1 3 6 </span><br><span class="line">4 5 0 </span><br><span class="line">7 8 2 </span><br><span class="line">F: 15 H: 4 G: 11</span><br><span class="line">-------------</span><br><span class="line">1 3 6 </span><br><span class="line">4 5 2 </span><br><span class="line">7 8 0 </span><br><span class="line">F: 15 H: 3 G: 12</span><br><span class="line">-------------</span><br><span class="line">1 3 6 </span><br><span class="line">4 5 2 </span><br><span class="line">7 0 8 </span><br><span class="line">F: 18 H: 5 G: 13</span><br><span class="line">-------------</span><br><span class="line">1 3 6 </span><br><span class="line">4 0 2 </span><br><span class="line">7 5 8 </span><br><span class="line">F: 20 H: 6 G: 14</span><br><span class="line">-------------</span><br><span class="line">1 3 6 </span><br><span class="line">4 2 0 </span><br><span class="line">7 5 8 </span><br><span class="line">F: 21 H: 6 G: 15</span><br><span class="line">-------------</span><br><span class="line">1 3 0 </span><br><span class="line">4 2 6 </span><br><span class="line">7 5 8 </span><br><span class="line">F: 21 H: 5 G: 16</span><br><span class="line">-------------</span><br><span class="line">1 0 3 </span><br><span class="line">4 2 6 </span><br><span class="line">7 5 8 </span><br><span class="line">F: 21 H: 4 G: 17</span><br><span class="line">-------------</span><br><span class="line">1 2 3 </span><br><span class="line">4 0 6 </span><br><span class="line">7 5 8 </span><br><span class="line">F: 21 H: 3 G: 18</span><br><span class="line">-------------</span><br><span class="line">1 2 3 </span><br><span class="line">4 5 6 </span><br><span class="line">7 0 8 </span><br><span class="line">F: 21 H: 2 G: 19</span><br><span class="line">-------------</span><br><span class="line">1 2 3 </span><br><span class="line">4 5 6 </span><br><span class="line">7 8 0 </span><br><span class="line">F: 20 H: 0 G: 20</span><br><span class="line">Process finished with 3721 times iteration.</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="示例2-4-4"><a href="#示例2-4-4" class="headerlink" title="示例2 (4*4)"></a>示例2 (4*4)</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;0,6,2,3&#125;,                                      1  2  3  4</span><br><span class="line">&#123;1,7,12,11&#125;,                          &#x3D;&gt;         5  6  7  8</span><br><span class="line">&#123;5,9,10,4&#125;,                                      9 10 11 12</span><br><span class="line">&#123;13,14,8,15&#125;&#125;;                                  13 14 15  0</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br></pre></td><td class="code"><pre><span class="line">-------------</span><br><span class="line"> 0  6  2  3 </span><br><span class="line"> 1  7 12 11 </span><br><span class="line"> 5  9 10  4 </span><br><span class="line">13 14  8 15 </span><br><span class="line">F: 14 H: 14 G: 0</span><br><span class="line">-------------</span><br><span class="line"> 1  6  2  3 </span><br><span class="line"> 0  7 12 11 </span><br><span class="line"> 5  9 10  4 </span><br><span class="line">13 14  8 15 </span><br><span class="line">F: 14 H: 13 G: 1</span><br><span class="line">-------------</span><br><span class="line"> 1  6  2  3 </span><br><span class="line"> 5  7 12 11 </span><br><span class="line"> 0  9 10  4 </span><br><span class="line">13 14  8 15 </span><br><span class="line">F: 14 H: 12 G: 2</span><br><span class="line">-------------</span><br><span class="line"> 1  6  2  3 </span><br><span class="line"> 5  7 12 11 </span><br><span class="line"> 9  0 10  4 </span><br><span class="line">13 14  8 15 </span><br><span class="line">F: 14 H: 11 G: 3</span><br><span class="line">-------------</span><br><span class="line"> 1  6  2  3 </span><br><span class="line"> 5  7 12 11 </span><br><span class="line"> 9 10  0  4 </span><br><span class="line">13 14  8 15 </span><br><span class="line">F: 14 H: 10 G: 4</span><br><span class="line">-------------</span><br><span class="line"> 1  6  2  3 </span><br><span class="line"> 5  7  0 11 </span><br><span class="line"> 9 10 12  4 </span><br><span class="line">13 14  8 15 </span><br><span class="line">F: 15 H: 10 G: 5</span><br><span class="line">-------------</span><br><span class="line"> 1  6  2  3 </span><br><span class="line"> 5  7 11  0 </span><br><span class="line"> 9 10 12  4 </span><br><span class="line">13 14  8 15 </span><br><span class="line">F: 16 H: 10 G: 6</span><br><span class="line">-------------</span><br><span class="line"> 1  6  2  3 </span><br><span class="line"> 5  7 11  4 </span><br><span class="line"> 9 10 12  0 </span><br><span class="line">13 14  8 15 </span><br><span class="line">F: 17 H: 10 G: 7</span><br><span class="line">-------------</span><br><span class="line"> 1  6  2  3 </span><br><span class="line"> 5  7 11  4 </span><br><span class="line"> 9 10  0 12 </span><br><span class="line">13 14  8 15 </span><br><span class="line">F: 17 H: 9 G: 8</span><br><span class="line">-------------</span><br><span class="line"> 1  6  2  3 </span><br><span class="line"> 5  7 11  4 </span><br><span class="line"> 9 10  8 12 </span><br><span class="line">13 14  0 15 </span><br><span class="line">F: 18 H: 9 G: 9</span><br><span class="line">-------------</span><br><span class="line"> 1  6  2  3 </span><br><span class="line"> 5  7 11  4 </span><br><span class="line"> 9 10  8 12 </span><br><span class="line">13 14 15  0 </span><br><span class="line">F: 17 H: 7 G: 10</span><br><span class="line">-------------</span><br><span class="line"> 1  6  2  3 </span><br><span class="line"> 5  7 11  4 </span><br><span class="line"> 9 10  8  0 </span><br><span class="line">13 14 15 12 </span><br><span class="line">F: 20 H: 9 G: 11</span><br><span class="line">-------------</span><br><span class="line"> 1  6  2  3 </span><br><span class="line"> 5  7 11  4 </span><br><span class="line"> 9 10  0  8 </span><br><span class="line">13 14 15 12 </span><br><span class="line">F: 21 H: 9 G: 12</span><br><span class="line">-------------</span><br><span class="line"> 1  6  2  3 </span><br><span class="line"> 5  7  0  4 </span><br><span class="line"> 9 10 11  8 </span><br><span class="line">13 14 15 12 </span><br><span class="line">F: 21 H: 8 G: 13</span><br><span class="line">-------------</span><br><span class="line"> 1  6  2  3 </span><br><span class="line"> 5  0  7  4 </span><br><span class="line"> 9 10 11  8 </span><br><span class="line">13 14 15 12 </span><br><span class="line">F: 21 H: 7 G: 14</span><br><span class="line">-------------</span><br><span class="line"> 1  0  2  3 </span><br><span class="line"> 5  6  7  4 </span><br><span class="line"> 9 10 11  8 </span><br><span class="line">13 14 15 12 </span><br><span class="line">F: 21 H: 6 G: 15</span><br><span class="line">-------------</span><br><span class="line"> 1  2  0  3 </span><br><span class="line"> 5  6  7  4 </span><br><span class="line"> 9 10 11  8 </span><br><span class="line">13 14 15 12 </span><br><span class="line">F: 21 H: 5 G: 16</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  0 </span><br><span class="line"> 5  6  7  4 </span><br><span class="line"> 9 10 11  8 </span><br><span class="line">13 14 15 12 </span><br><span class="line">F: 21 H: 4 G: 17</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  4 </span><br><span class="line"> 5  6  7  0 </span><br><span class="line"> 9 10 11  8 </span><br><span class="line">13 14 15 12 </span><br><span class="line">F: 21 H: 3 G: 18</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  4 </span><br><span class="line"> 5  6  7  8 </span><br><span class="line"> 9 10 11  0 </span><br><span class="line">13 14 15 12 </span><br><span class="line">F: 21 H: 2 G: 19</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  4 </span><br><span class="line"> 5  6  7  8 </span><br><span class="line"> 9 10 11 12 </span><br><span class="line">13 14 15  0 </span><br><span class="line">F: 20 H: 0 G: 20</span><br><span class="line">Process finished with 2217 times iteration.</span><br></pre></td></tr></table></figure>
+
+<h2 id="示例3-5-5"><a href="#示例3-5-5" class="headerlink" title="示例3 (5*5)"></a>示例3 (5*5)</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;1,2,3,5,9&#125;,                                 1  2  3  4  5</span><br><span class="line">&#123;6,7,8,4,10&#125;,                                 6  7  8  9 10</span><br><span class="line">&#123;11,12,13,19,14&#125;,                   &#x3D;&gt;       11 12 13 14 15</span><br><span class="line">&#123;0,17,21,18,15&#125;,                             16 17 18 19 20</span><br><span class="line">&#123;16,22,23,24,20&#125;&#125;;                           21 22 23 24  0</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br></pre></td><td class="code"><pre><span class="line">-------------</span><br><span class="line"> 1  2  3  5  9 </span><br><span class="line"> 6  7  8  4 10 </span><br><span class="line">11 12 13 19 14 </span><br><span class="line"> 0 17 21 18 15 </span><br><span class="line">16 22 23 24 20 </span><br><span class="line">F: 11 H: 11 G: 0</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  5  9 </span><br><span class="line"> 6  7  8  4 10 </span><br><span class="line">11 12 13 19 14 </span><br><span class="line">17  0 21 18 15 </span><br><span class="line">16 22 23 24 20 </span><br><span class="line">F: 13 H: 12 G: 1</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  5  9 </span><br><span class="line"> 6  7  8  4 10 </span><br><span class="line">11 12 13 19 14 </span><br><span class="line">17 21  0 18 15 </span><br><span class="line">16 22 23 24 20 </span><br><span class="line">F: 14 H: 12 G: 2</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  5  9 </span><br><span class="line"> 6  7  8  4 10 </span><br><span class="line">11 12 13 19 14 </span><br><span class="line">17 21 23 18 15 </span><br><span class="line">16 22  0 24 20 </span><br><span class="line">F: 16 H: 13 G: 3</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  5  9 </span><br><span class="line"> 6  7  8  4 10 </span><br><span class="line">11 12 13 19 14 </span><br><span class="line">17 21 23 18 15 </span><br><span class="line">16  0 22 24 20 </span><br><span class="line">F: 18 H: 14 G: 4</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  5  9 </span><br><span class="line"> 6  7  8  4 10 </span><br><span class="line">11 12 13 19 14 </span><br><span class="line">17  0 23 18 15 </span><br><span class="line">16 21 22 24 20 </span><br><span class="line">F: 19 H: 14 G: 5</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  5  9 </span><br><span class="line"> 6  7  8  4 10 </span><br><span class="line">11 12 13 19 14 </span><br><span class="line"> 0 17 23 18 15 </span><br><span class="line">16 21 22 24 20 </span><br><span class="line">F: 19 H: 13 G: 6</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  5  9 </span><br><span class="line"> 6  7  8  4 10 </span><br><span class="line">11 12 13 19 14 </span><br><span class="line">16 17 23 18 15 </span><br><span class="line"> 0 21 22 24 20 </span><br><span class="line">F: 19 H: 12 G: 7</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  5  9 </span><br><span class="line"> 6  7  8  4 10 </span><br><span class="line">11 12 13 19 14 </span><br><span class="line">16 17 23 18 15 </span><br><span class="line">21  0 22 24 20 </span><br><span class="line">F: 19 H: 11 G: 8</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  5  9 </span><br><span class="line"> 6  7  8  4 10 </span><br><span class="line">11 12 13 19 14 </span><br><span class="line">16 17 23 18 15 </span><br><span class="line">21 22  0 24 20 </span><br><span class="line">F: 19 H: 10 G: 9</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  5  9 </span><br><span class="line"> 6  7  8  4 10 </span><br><span class="line">11 12 13 19 14 </span><br><span class="line">16 17  0 18 15 </span><br><span class="line">21 22 23 24 20 </span><br><span class="line">F: 19 H: 9 G: 10</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  5  9 </span><br><span class="line"> 6  7  8  4 10 </span><br><span class="line">11 12 13 19 14 </span><br><span class="line">16 17 18  0 15 </span><br><span class="line">21 22 23 24 20 </span><br><span class="line">F: 19 H: 8 G: 11</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  5  9 </span><br><span class="line"> 6  7  8  4 10 </span><br><span class="line">11 12 13  0 14 </span><br><span class="line">16 17 18 19 15 </span><br><span class="line">21 22 23 24 20 </span><br><span class="line">F: 19 H: 7 G: 12</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  5  9 </span><br><span class="line"> 6  7  8  4 10 </span><br><span class="line">11 12 13 14  0 </span><br><span class="line">16 17 18 19 15 </span><br><span class="line">21 22 23 24 20 </span><br><span class="line">F: 19 H: 6 G: 13</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  5  9 </span><br><span class="line"> 6  7  8  4  0 </span><br><span class="line">11 12 13 14 10 </span><br><span class="line">16 17 18 19 15 </span><br><span class="line">21 22 23 24 20 </span><br><span class="line">F: 21 H: 7 G: 14</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  5  0 </span><br><span class="line"> 6  7  8  4  9 </span><br><span class="line">11 12 13 14 10 </span><br><span class="line">16 17 18 19 15 </span><br><span class="line">21 22 23 24 20 </span><br><span class="line">F: 22 H: 7 G: 15</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  0  5 </span><br><span class="line"> 6  7  8  4  9 </span><br><span class="line">11 12 13 14 10 </span><br><span class="line">16 17 18 19 15 </span><br><span class="line">21 22 23 24 20 </span><br><span class="line">F: 22 H: 6 G: 16</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  4  5 </span><br><span class="line"> 6  7  8  0  9 </span><br><span class="line">11 12 13 14 10 </span><br><span class="line">16 17 18 19 15 </span><br><span class="line">21 22 23 24 20 </span><br><span class="line">F: 22 H: 5 G: 17</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  4  5 </span><br><span class="line"> 6  7  8  9  0 </span><br><span class="line">11 12 13 14 10 </span><br><span class="line">16 17 18 19 15 </span><br><span class="line">21 22 23 24 20 </span><br><span class="line">F: 22 H: 4 G: 18</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  4  5 </span><br><span class="line"> 6  7  8  9 10 </span><br><span class="line">11 12 13 14  0 </span><br><span class="line">16 17 18 19 15 </span><br><span class="line">21 22 23 24 20 </span><br><span class="line">F: 22 H: 3 G: 19</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  4  5 </span><br><span class="line"> 6  7  8  9 10 </span><br><span class="line">11 12 13 14 15 </span><br><span class="line">16 17 18 19  0 </span><br><span class="line">21 22 23 24 20 </span><br><span class="line">F: 22 H: 2 G: 20</span><br><span class="line">-------------</span><br><span class="line"> 1  2  3  4  5 </span><br><span class="line"> 6  7  8  9 10 </span><br><span class="line">11 12 13 14 15 </span><br><span class="line">16 17 18 19 20 </span><br><span class="line">21 22 23 24  0 </span><br><span class="line">F: 21 H: 0 G: 21</span><br><span class="line">Process finished with 2567 times iteration.</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Machine-Learning/" rel="tag"># Machine Learning</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/02/Leetcode/Leetcode%20136%20Single%20Number/" rel="prev" title="Leetcode 136 Single Number">
+      <i class="fa fa-chevron-left"></i> Leetcode 136 Single Number
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/04/Leetcode/Leetcode%20137%20Single%20Number%20II/" rel="next" title="Leetcode 137 Single Number II">
+      Leetcode 137 Single Number II <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#h%E5%87%BD%E6%95%B0%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">2.</span> <span class="nav-text">h函数的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8BGrid%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">3.</span> <span class="nav-text">基本类型Grid的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8A%B6%E6%80%81%E8%8A%82%E7%82%B9%E7%B1%BB%E5%9E%8BState%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">4.</span> <span class="nav-text">状态节点类型State的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E6%B5%8B%E8%AF%95%E6%A0%B7%E4%BE%8B%E7%9A%84%E8%BE%85%E5%8A%A9%E7%B1%BB"><span class="nav-number">5.</span> <span class="nav-text">构造测试样例的辅助类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E7%94%A8A-%E7%AE%97%E6%B3%95%E7%9A%84%E4%B8%BB%E5%87%BD%E6%95%B0%E7%B1%BB"><span class="nav-number">6.</span> <span class="nav-text">调用A*算法的主函数类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B1-3-3"><span class="nav-number">7.</span> <span class="nav-text">示例1 (3*3)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B2-4-4"><span class="nav-number">8.</span> <span class="nav-text">示例2 (4*4)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B3-5-5"><span class="nav-number">9.</span> <span class="nav-text">示例3 (5*5)</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Haiyang Yu"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Haiyang Yu</p>
+  <div class="site-description" itemprop="description">Be Curious about Everything</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">314</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/HaiyangYu1999" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;HaiyangYu1999" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572808459@qq.com" title="E-Mail → mailto:1572808459@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/HaiyangYu1999" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;HaiyangYu1999" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://stackoverflow.com/users/14220101/haiyangyu" title="StackOverflow → https:&#x2F;&#x2F;stackoverflow.com&#x2F;users&#x2F;14220101&#x2F;haiyangyu" rel="noopener" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>StackOverflow</a>
+      </span>
+  </div>
+
+
+  
+
+  <div class="">
+    
+
+    <div class="">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">rss</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <!--music player-->
+        
+        <div>
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="210" height="110" src="//music.163.com/outchain/player?type=2&id=32320820&auto=0&height=66"></iframe>
+        </div>
+        
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Haiyang Yu</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">794k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">12:02</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'hxe9hqY7qITFtGDgNC1b3MTb-MdYXbMMI',
+      appKey     : 'guH4jp25sS3mDPzFPcRSNvdJ',
+      placeholder: "快来评论一下吧~",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+<canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+<script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+<script type="text/javascript" src="/js/fireworks.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"left","width":200,"height":350},"mobile":{"show":true},"log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Grandstander:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="WSL2(Ubuntu 18.04)安装MySQL 前言因为在windows下面mysql安装很简单, 所以没把安装MySQL当成一个很难的事情. 结果踩了一晚上的坑.  安装首先是按照网上的各种教程按部就班的安装. (这里我还没有意识到WSL的Ubuntu18.04和普通的Ubuntu18.04有什么不同) 这里我是跟着https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;64080934上">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WSL2(Ubuntu18.04)安装MySQL8.0">
+<meta property="og:url" content="https://yoursite/2020/10/09/WSL/WSL2InstallMysql/index.html">
+<meta property="og:site_name" content="Haiyang Yu&#39;s Blog">
+<meta property="og:description" content="WSL2(Ubuntu 18.04)安装MySQL 前言因为在windows下面mysql安装很简单, 所以没把安装MySQL当成一个很难的事情. 结果踩了一晚上的坑.  安装首先是按照网上的各种教程按部就班的安装. (这里我还没有意识到WSL的Ubuntu18.04和普通的Ubuntu18.04有什么不同) 这里我是跟着https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;64080934上">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-10-09T14:52:27.000Z">
+<meta property="article:modified_time" content="2020-10-10T05:04:29.435Z">
+<meta property="article:author" content="Haiyang Yu">
+<meta property="article:tag" content="WSL">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://yoursite/2020/10/09/WSL/WSL2InstallMysql/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>WSL2(Ubuntu18.04)安装MySQL8.0 | Haiyang Yu's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Haiyang Yu's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Haiyang Yu's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/HaiyangYu1999" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://yoursite/2020/10/09/WSL/WSL2InstallMysql/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Haiyang Yu">
+      <meta itemprop="description" content="Be Curious about Everything">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Haiyang Yu's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          WSL2(Ubuntu18.04)安装MySQL8.0
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-09 22:52:27" itemprop="dateCreated datePublished" datetime="2020-10-09T22:52:27+08:00">2020-10-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-10-10 13:04:29" itemprop="dateModified" datetime="2020-10-10T13:04:29+08:00">2020-10-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/WSL/" itemprop="url" rel="index"><span itemprop="name">WSL</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/10/09/WSL/WSL2InstallMysql/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/10/09/WSL/WSL2InstallMysql/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>12k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>11 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>WSL2(Ubuntu 18.04)安装MySQL</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>因为在windows下面mysql安装很简单, 所以没把安装MySQL当成一个很难的事情. 结果踩了一晚上的坑. </p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>首先是按照网上的各种教程按部就班的安装. (这里我还没有意识到WSL的Ubuntu18.04和普通的Ubuntu18.04有什么不同)</p>
+<p>这里我是跟着<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/64080934">https://zhuanlan.zhihu.com/p/64080934</a>上面的步骤来做的. 要注意以下两点</p>
+<ul>
+<li>Ubuntu18.04是不兼容MySQL5.7的. 安装MySQL5.7可能导致有些功能不正常使用.</li>
+<li>在安装的过程中, 输入两次默认root密码之后, 会让你选择验证插件<code>default authentication plugin</code> , 这时候<strong>一定要选择下面那个”Use Legacy Authentication Method (Retain MySQL 5.x Compatibility)”</strong>. 否则也可能出现兼容问题。</li>
+</ul>
+<h2 id="入坑"><a href="#入坑" class="headerlink" title="入坑"></a>入坑</h2><p>这时候看着安装教程的你以为安装完了? NO!</p>
+<p>当你兴高采烈的使用<code>mysql -u root -p</code>想开启mysql时, 会发现他出了这么一个错</p>
+<blockquote>
+<p>ERROR 2002 (HY000): Can’t connect to local MySQL server through socket ‘/var/run/mysqld/mysqld.sock’ (2)</p>
+</blockquote>
+<p>这时, 你原本以为复制一下错误信息Google一下怎么解决就完事了.</p>
+<p>但是会发现网上几乎所有的解决方案都是建立一个软连接, 并且人家都是有<code>mysqld.sock</code>这个文件, 只不过不在<code>/var/run/mysqld/</code>目录下面. 这时人家建立一个软连接<code>ln -s /storage/db/mysql/mysql.sock /var/lib/mysql/mysql.sock</code>就能解决问题了.</p>
+<p>而你呢, 找了半天都找不到<code>mysqld.sock</code>这个文件在哪里!!!</p>
+<p>之后, 你再Google解决方案, 会发现, 别人的解决办法对你根本不适用.</p>
+<a id="more"></a>
+
+<h2 id="脱坑"><a href="#脱坑" class="headerlink" title="脱坑"></a>脱坑</h2><p>根本原因在于<strong>WSL的Ubuntu18.04和普通的Ubuntu18.04是不一样的</strong>!</p>
+<p>意识到这个问题之后, 找到了这样的一篇文章, <a target="_blank" rel="noopener" href="https://www.cnblogs.com/panlq/p/13704965.html">https://www.cnblogs.com/panlq/p/13704965.html</a> 完美解决了问题. 是因为我们没有办法通过<code>sudo service mysql start</code>这样的命令来启动MySQL. 即<code>/etc/init.d/</code>目录下面没有对应的启动文件. 自然没法连接上mysql服务器.</p>
+<p>这里可以通过复制<a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/mysql/mysql-server/8.0/support-files/mysql.server.sh">https://raw.githubusercontent.com/mysql/mysql-server/8.0/support-files/mysql.server.sh</a> 上面的内容到一个文件<code>mysql.server.sh</code>,</p>
+<p>要注意这个sh文件是需要自己改一些配置的, 需要配置以下字段</p>
+<blockquote>
+<p>basedir=/usr </p>
+<p>datadir=/var/lib/mysql</p>
+<p>mysqld_pid_file_path=/var/run/mysqld/mysqld.pid</p>
+</blockquote>
+<p>配置好之后将这个文件移动到<code>/etc/init.d/</code>中并设置为可执行. </p>
+<blockquote>
+<p>mv mysql.server.sh /etc/init.d/mysql</p>
+<p>chmod +x /etc/init.d/mysql</p>
+</blockquote>
+<p>这样就可以正常启动mysql了. </p>
+<p>由于<a href="raw.githubusercontent.com">raw.githubusercontent.com</a>需要科学上网才能下载, 特此将文件复制到本文中以供参考. 侵权删</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"><span class="comment"># Copyright Abandoned 1996 TCX DataKonsult AB &amp; Monty Program KB &amp; Detron HB</span></span><br><span class="line"><span class="comment"># This file is public domain and comes with NO WARRANTY of any kind</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># MySQL daemon start/stop script.</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Usually this is put in /etc/init.d (at least on machines SYSV R4 based</span></span><br><span class="line"><span class="comment"># systems) and linked to /etc/rc3.d/S99mysql and /etc/rc0.d/K01mysql.</span></span><br><span class="line"><span class="comment"># When this is done the mysql server will be started when the machine is</span></span><br><span class="line"><span class="comment"># started and shut down when the systems goes down.</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Comments to support chkconfig on RedHat Linux</span></span><br><span class="line"><span class="comment"># chkconfig: 2345 64 36</span></span><br><span class="line"><span class="comment"># description: A very fast and reliable SQL database engine.</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Comments to support LSB init script conventions</span></span><br><span class="line"><span class="comment">### BEGIN INIT INFO</span></span><br><span class="line"><span class="comment"># Provides: mysql</span></span><br><span class="line"><span class="comment"># Required-Start: $local_fs $network $remote_fs</span></span><br><span class="line"><span class="comment"># Should-Start: ypbind nscd ldap ntpd xntpd</span></span><br><span class="line"><span class="comment"># Required-Stop: $local_fs $network $remote_fs</span></span><br><span class="line"><span class="comment"># Default-Start:  2 3 4 5</span></span><br><span class="line"><span class="comment"># Default-Stop: 0 1 6</span></span><br><span class="line"><span class="comment"># Short-Description: start and stop MySQL</span></span><br><span class="line"><span class="comment"># Description: MySQL is a very fast and reliable SQL database engine.</span></span><br><span class="line"><span class="comment">### END INIT INFO</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># If you install MySQL on some other places than @prefix@, then you</span></span><br><span class="line"><span class="comment"># have to do one of the following things for this script to work:</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># - Run this script from within the MySQL installation directory</span></span><br><span class="line"><span class="comment"># - Create a /etc/my.cnf file with the following information:</span></span><br><span class="line"><span class="comment">#   [mysqld]</span></span><br><span class="line"><span class="comment">#   basedir=&lt;path-to-mysql-installation-directory&gt;</span></span><br><span class="line"><span class="comment"># - Add the above to any other configuration file (for example ~/.my.ini)</span></span><br><span class="line"><span class="comment">#   and copy my_print_defaults to /usr/bin</span></span><br><span class="line"><span class="comment"># - Add the path to the mysql-installation-directory to the basedir variable</span></span><br><span class="line"><span class="comment">#   below.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># If you want to affect other MySQL variables, you should make your changes</span></span><br><span class="line"><span class="comment"># in the /etc/my.cnf, ~/.my.cnf or other MySQL configuration files.</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># If you change base dir, you must also change datadir. These may get</span></span><br><span class="line"><span class="comment"># overwritten by settings in the MySQL configuration files.</span></span><br><span class="line"></span><br><span class="line">basedir=/usr</span><br><span class="line">datadir=/var/lib/mysql</span><br><span class="line"></span><br><span class="line"><span class="comment"># Default value, in seconds, afterwhich the script should timeout waiting</span></span><br><span class="line"><span class="comment"># for server start. </span></span><br><span class="line"><span class="comment"># Value here is overriden by value in my.cnf. </span></span><br><span class="line"><span class="comment"># 0 means don&#x27;t wait at all</span></span><br><span class="line"><span class="comment"># Negative numbers mean to wait indefinitely</span></span><br><span class="line">service_startup_timeout=900</span><br><span class="line"></span><br><span class="line"><span class="comment"># Lock directory for RedHat / SuSE.</span></span><br><span class="line">lockdir=<span class="string">&#x27;/var/lock/subsys&#x27;</span></span><br><span class="line">lock_file_path=<span class="string">&quot;<span class="variable">$lockdir</span>/mysql&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># The following variables are only set for letting mysql.server find things.</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Set some defaults</span></span><br><span class="line">sudo mkdir /var/run/mysqld</span><br><span class="line">sudo chmod -R 777 /var/run/mysqld</span><br><span class="line">mysqld_pid_file_path=/var/run/mysqld/mysqld.pid</span><br><span class="line"><span class="keyword">if</span> <span class="built_in">test</span> -z <span class="string">&quot;<span class="variable">$basedir</span>&quot;</span></span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">  basedir=@prefix@</span><br><span class="line">  bindir=@bindir@</span><br><span class="line">  <span class="keyword">if</span> <span class="built_in">test</span> -z <span class="string">&quot;<span class="variable">$datadir</span>&quot;</span></span><br><span class="line">  <span class="keyword">then</span></span><br><span class="line">    datadir=@localstatedir@</span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line">  sbindir=@sbindir@</span><br><span class="line">  libexecdir=@sbindir@</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">  bindir=<span class="string">&quot;<span class="variable">$basedir</span>/bin&quot;</span></span><br><span class="line">  <span class="keyword">if</span> <span class="built_in">test</span> -z <span class="string">&quot;<span class="variable">$datadir</span>&quot;</span></span><br><span class="line">  <span class="keyword">then</span></span><br><span class="line">    datadir=<span class="string">&quot;<span class="variable">$basedir</span>/data&quot;</span></span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line">  sbindir=<span class="string">&quot;<span class="variable">$basedir</span>/sbin&quot;</span></span><br><span class="line">  libexecdir=<span class="string">&quot;<span class="variable">$basedir</span>/libexec&quot;</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># datadir_set is used to determine if datadir was set (and so should be</span></span><br><span class="line"><span class="comment"># *not* set inside of the --basedir= handler.)</span></span><br><span class="line">datadir_set=</span><br><span class="line"></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Use LSB init script functions for printing messages, if possible</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line">lsb_functions=<span class="string">&quot;/lib/lsb/init-functions&quot;</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">test</span> -f <span class="variable">$lsb_functions</span> ; <span class="keyword">then</span></span><br><span class="line">  . <span class="variable">$lsb_functions</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">  log_success_msg()</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot; SUCCESS! <span class="variable">$@</span>&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">  log_failure_msg()</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot; ERROR! <span class="variable">$@</span>&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">PATH=<span class="string">&quot;/sbin:/usr/sbin:/bin:/usr/bin:<span class="variable">$basedir</span>/bin&quot;</span></span><br><span class="line"><span class="built_in">export</span> PATH</span><br><span class="line"></span><br><span class="line">mode=<span class="variable">$1</span>    <span class="comment"># start or stop</span></span><br><span class="line"></span><br><span class="line">[ <span class="variable">$#</span> -ge 1 ] &amp;&amp; <span class="built_in">shift</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">other_args=<span class="string">&quot;$*&quot;</span>   <span class="comment"># uncommon, but needed when called from an RPM upgrade action</span></span><br><span class="line">           <span class="comment"># Expected: &quot;--skip-networking --skip-grant-tables&quot;</span></span><br><span class="line">           <span class="comment"># They are not checked here, intentionally, as it is the resposibility</span></span><br><span class="line">           <span class="comment"># of the &quot;spec&quot; file author to give correct arguments only.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">case</span> `<span class="built_in">echo</span> <span class="string">&quot;testing\c&quot;</span>`,`<span class="built_in">echo</span> -n testing` <span class="keyword">in</span></span><br><span class="line">    *c*,-n*) echo_n=   echo_c=     ;;</span><br><span class="line">    *c*,*)   echo_n=-n echo_c=     ;;</span><br><span class="line">    *)       echo_n=   echo_c=<span class="string">&#x27;\c&#x27;</span> ;;</span><br><span class="line"><span class="keyword">esac</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">parse_server_arguments</span></span>() &#123;</span><br><span class="line">  <span class="keyword">for</span> arg <span class="keyword">do</span></span><br><span class="line">    <span class="keyword">case</span> <span class="string">&quot;<span class="variable">$arg</span>&quot;</span> <span class="keyword">in</span></span><br><span class="line">      --basedir=*)  basedir=`<span class="built_in">echo</span> <span class="string">&quot;<span class="variable">$arg</span>&quot;</span> | sed -e <span class="string">&#x27;s/^[^=]*=//&#x27;</span>`</span><br><span class="line">                    bindir=<span class="string">&quot;<span class="variable">$basedir</span>/bin&quot;</span></span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">test</span> -z <span class="string">&quot;<span class="variable">$datadir_set</span>&quot;</span>; <span class="keyword">then</span></span><br><span class="line">              datadir=<span class="string">&quot;<span class="variable">$basedir</span>/data&quot;</span></span><br><span class="line">            <span class="keyword">fi</span></span><br><span class="line">            sbindir=<span class="string">&quot;<span class="variable">$basedir</span>/sbin&quot;</span></span><br><span class="line">            libexecdir=<span class="string">&quot;<span class="variable">$basedir</span>/libexec&quot;</span></span><br><span class="line">        ;;</span><br><span class="line">      --datadir=*)  datadir=`<span class="built_in">echo</span> <span class="string">&quot;<span class="variable">$arg</span>&quot;</span> | sed -e <span class="string">&#x27;s/^[^=]*=//&#x27;</span>`</span><br><span class="line">            datadir_set=1</span><br><span class="line">    ;;</span><br><span class="line">      --pid-file=*) mysqld_pid_file_path=`<span class="built_in">echo</span> <span class="string">&quot;<span class="variable">$arg</span>&quot;</span> | sed -e <span class="string">&#x27;s/^[^=]*=//&#x27;</span>` ;;</span><br><span class="line">      --service-startup-timeout=*) service_startup_timeout=`<span class="built_in">echo</span> <span class="string">&quot;<span class="variable">$arg</span>&quot;</span> | sed -e <span class="string">&#x27;s/^[^=]*=//&#x27;</span>` ;;</span><br><span class="line">    <span class="keyword">esac</span></span><br><span class="line">  <span class="keyword">done</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">wait_for_pid</span></span> () &#123;</span><br><span class="line">  verb=<span class="string">&quot;<span class="variable">$1</span>&quot;</span>           <span class="comment"># created | removed</span></span><br><span class="line">  pid=<span class="string">&quot;<span class="variable">$2</span>&quot;</span>            <span class="comment"># process ID of the program operating on the pid-file</span></span><br><span class="line">  pid_file_path=<span class="string">&quot;<span class="variable">$3</span>&quot;</span> <span class="comment"># path to the PID file.</span></span><br><span class="line"></span><br><span class="line">  i=0</span><br><span class="line">  avoid_race_condition=<span class="string">&quot;by checking again&quot;</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span> <span class="built_in">test</span> <span class="variable">$i</span> -ne <span class="variable">$service_startup_timeout</span> ; <span class="keyword">do</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> <span class="string">&quot;<span class="variable">$verb</span>&quot;</span> <span class="keyword">in</span></span><br><span class="line">      <span class="string">&#x27;created&#x27;</span>)</span><br><span class="line">        <span class="comment"># wait for a PID-file to pop into existence.</span></span><br><span class="line">        <span class="built_in">test</span> -s <span class="string">&quot;<span class="variable">$pid_file_path</span>&quot;</span> &amp;&amp; i=<span class="string">&#x27;&#x27;</span> &amp;&amp; <span class="built_in">break</span></span><br><span class="line">        ;;</span><br><span class="line">      <span class="string">&#x27;removed&#x27;</span>)</span><br><span class="line">        <span class="comment"># wait for this PID-file to disappear</span></span><br><span class="line">        <span class="built_in">test</span> ! -s <span class="string">&quot;<span class="variable">$pid_file_path</span>&quot;</span> &amp;&amp; i=<span class="string">&#x27;&#x27;</span> &amp;&amp; <span class="built_in">break</span></span><br><span class="line">        ;;</span><br><span class="line">      *)</span><br><span class="line">        <span class="built_in">echo</span> <span class="string">&quot;wait_for_pid () usage: wait_for_pid created|removed pid pid_file_path&quot;</span></span><br><span class="line">        <span class="built_in">exit</span> 1</span><br><span class="line">        ;;</span><br><span class="line">    <span class="keyword">esac</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># if server isn&#x27;t running, then pid-file will never be updated</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">test</span> -n <span class="string">&quot;<span class="variable">$pid</span>&quot;</span>; <span class="keyword">then</span></span><br><span class="line">      <span class="keyword">if</span> <span class="built_in">kill</span> -0 <span class="string">&quot;<span class="variable">$pid</span>&quot;</span> 2&gt;/dev/null; <span class="keyword">then</span></span><br><span class="line">        :  <span class="comment"># the server still runs</span></span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">        <span class="comment"># The server may have exited between the last pid-file check and now.  </span></span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">test</span> -n <span class="string">&quot;<span class="variable">$avoid_race_condition</span>&quot;</span>; <span class="keyword">then</span></span><br><span class="line">          avoid_race_condition=<span class="string">&quot;&quot;</span></span><br><span class="line">          <span class="built_in">continue</span>  <span class="comment"># Check again.</span></span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># there&#x27;s nothing that will affect the file.</span></span><br><span class="line">        log_failure_msg <span class="string">&quot;The server quit without updating PID file (<span class="variable">$pid_file_path</span>).&quot;</span></span><br><span class="line">        <span class="built_in">return</span> 1  <span class="comment"># not waiting any more.</span></span><br><span class="line">      <span class="keyword">fi</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">echo</span> <span class="variable">$echo_n</span> <span class="string">&quot;.<span class="variable">$echo_c</span>&quot;</span></span><br><span class="line">    i=`expr <span class="variable">$i</span> + 1`</span><br><span class="line">    sleep 1</span><br><span class="line"></span><br><span class="line">  <span class="keyword">done</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> <span class="built_in">test</span> -z <span class="string">&quot;<span class="variable">$i</span>&quot;</span> ; <span class="keyword">then</span></span><br><span class="line">    log_success_msg</span><br><span class="line">    <span class="built_in">return</span> 0</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    log_failure_msg</span><br><span class="line">    <span class="built_in">return</span> 1</span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># Get arguments from the my.cnf file,</span></span><br><span class="line"><span class="comment"># the only group, which is read from now on is [mysqld]</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">test</span> -x <span class="string">&quot;<span class="variable">$bindir</span>/my_print_defaults&quot;</span>;  <span class="keyword">then</span></span><br><span class="line">  print_defaults=<span class="string">&quot;<span class="variable">$bindir</span>/my_print_defaults&quot;</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">  <span class="comment"># Try to find basedir in /etc/my.cnf</span></span><br><span class="line">  conf=/etc/my.cnf</span><br><span class="line">  print_defaults=</span><br><span class="line">  <span class="keyword">if</span> <span class="built_in">test</span> -r <span class="variable">$conf</span></span><br><span class="line">  <span class="keyword">then</span></span><br><span class="line">    subpat=<span class="string">&#x27;^[^=]*basedir[^=]*=\(.*\)$&#x27;</span></span><br><span class="line">    <span class="built_in">dirs</span>=`sed -e <span class="string">&quot;/<span class="variable">$subpat</span>/!d&quot;</span> -e <span class="string">&#x27;s//\1/&#x27;</span> <span class="variable">$conf</span>`</span><br><span class="line">    <span class="keyword">for</span> d <span class="keyword">in</span> <span class="variable">$dirs</span></span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">      d=`<span class="built_in">echo</span> <span class="variable">$d</span> | sed -e <span class="string">&#x27;s/[     ]//g&#x27;</span>`</span><br><span class="line">      <span class="keyword">if</span> <span class="built_in">test</span> -x <span class="string">&quot;<span class="variable">$d</span>/bin/my_print_defaults&quot;</span></span><br><span class="line">      <span class="keyword">then</span></span><br><span class="line">        print_defaults=<span class="string">&quot;<span class="variable">$d</span>/bin/my_print_defaults&quot;</span></span><br><span class="line">        <span class="built_in">break</span></span><br><span class="line">      <span class="keyword">fi</span></span><br><span class="line">    <span class="keyword">done</span></span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Hope it&#x27;s in the PATH ... but I doubt it</span></span><br><span class="line">  <span class="built_in">test</span> -z <span class="string">&quot;<span class="variable">$print_defaults</span>&quot;</span> &amp;&amp; print_defaults=<span class="string">&quot;my_print_defaults&quot;</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Read defaults file from &#x27;basedir&#x27;.   If there is no defaults file there</span></span><br><span class="line"><span class="comment"># check if it&#x27;s in the old (depricated) place (datadir) and read it from there</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"></span><br><span class="line">extra_args=<span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">test</span> -r <span class="string">&quot;<span class="variable">$basedir</span>/my.cnf&quot;</span></span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">  extra_args=<span class="string">&quot;-e <span class="variable">$basedir</span>/my.cnf&quot;</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">parse_server_arguments `<span class="variable">$print_defaults</span> <span class="variable">$extra_args</span> mysqld server mysql_server mysql.server`</span><br><span class="line"></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Set pid file if not given</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">test</span> -z <span class="string">&quot;<span class="variable">$mysqld_pid_file_path</span>&quot;</span></span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">  mysqld_pid_file_path=<span class="variable">$datadir</span>/`hostname`.pid</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">  <span class="keyword">case</span> <span class="string">&quot;<span class="variable">$mysqld_pid_file_path</span>&quot;</span> <span class="keyword">in</span></span><br><span class="line">    /* ) ;;</span><br><span class="line">    * )  mysqld_pid_file_path=<span class="string">&quot;<span class="variable">$datadir</span>/<span class="variable">$mysqld_pid_file_path</span>&quot;</span> ;;</span><br><span class="line">  <span class="keyword">esac</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">case</span> <span class="string">&quot;<span class="variable">$mode</span>&quot;</span> <span class="keyword">in</span></span><br><span class="line">  <span class="string">&#x27;start&#x27;</span>)</span><br><span class="line">    <span class="comment"># Start daemon</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Safeguard (relative paths, core dumps..)</span></span><br><span class="line">    <span class="built_in">cd</span> <span class="variable">$basedir</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">echo</span> <span class="variable">$echo_n</span> <span class="string">&quot;Starting MySQL&quot;</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">test</span> -x <span class="variable">$bindir</span>/mysqld_safe</span><br><span class="line">    <span class="keyword">then</span></span><br><span class="line">      <span class="comment"># Give extra arguments to mysqld with the my.cnf file. This script</span></span><br><span class="line">      <span class="comment"># may be overwritten at next upgrade.</span></span><br><span class="line">      <span class="variable">$bindir</span>/mysqld_safe --datadir=<span class="string">&quot;<span class="variable">$datadir</span>&quot;</span> --pid-file=<span class="string">&quot;<span class="variable">$mysqld_pid_file_path</span>&quot;</span> <span class="variable">$other_args</span> &gt;/dev/null &amp;</span><br><span class="line">      wait_for_pid created <span class="string">&quot;$!&quot;</span> <span class="string">&quot;<span class="variable">$mysqld_pid_file_path</span>&quot;</span>; return_value=$?</span><br><span class="line"></span><br><span class="line">      <span class="comment"># Make lock for RedHat / SuSE</span></span><br><span class="line">      <span class="keyword">if</span> <span class="built_in">test</span> -w <span class="string">&quot;<span class="variable">$lockdir</span>&quot;</span></span><br><span class="line">      <span class="keyword">then</span></span><br><span class="line">        touch <span class="string">&quot;<span class="variable">$lock_file_path</span>&quot;</span></span><br><span class="line">      <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">      <span class="built_in">exit</span> <span class="variable">$return_value</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      log_failure_msg <span class="string">&quot;Couldn&#x27;t find MySQL server (<span class="variable">$bindir</span>/mysqld_safe)&quot;</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">    ;;</span><br><span class="line"></span><br><span class="line">  <span class="string">&#x27;stop&#x27;</span>)</span><br><span class="line">    <span class="comment"># Stop daemon. We use a signal here to avoid having to know the</span></span><br><span class="line">    <span class="comment"># root password.</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">test</span> -s <span class="string">&quot;<span class="variable">$mysqld_pid_file_path</span>&quot;</span></span><br><span class="line">    <span class="keyword">then</span></span><br><span class="line">      <span class="comment"># signal mysqld_safe that it needs to stop</span></span><br><span class="line">      touch <span class="string">&quot;<span class="variable">$mysqld_pid_file_path</span>.shutdown&quot;</span></span><br><span class="line"></span><br><span class="line">      mysqld_pid=`cat <span class="string">&quot;<span class="variable">$mysqld_pid_file_path</span>&quot;</span>`</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (<span class="built_in">kill</span> -0 <span class="variable">$mysqld_pid</span> 2&gt;/dev/null)</span><br><span class="line">      <span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="variable">$echo_n</span> <span class="string">&quot;Shutting down MySQL&quot;</span></span><br><span class="line">        <span class="built_in">kill</span> <span class="variable">$mysqld_pid</span></span><br><span class="line">        <span class="comment"># mysqld should remove the pid file when it exits, so wait for it.</span></span><br><span class="line">        wait_for_pid removed <span class="string">&quot;<span class="variable">$mysqld_pid</span>&quot;</span> <span class="string">&quot;<span class="variable">$mysqld_pid_file_path</span>&quot;</span>; return_value=$?</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">        log_failure_msg <span class="string">&quot;MySQL server process #<span class="variable">$mysqld_pid</span> is not running!&quot;</span></span><br><span class="line">        rm <span class="string">&quot;<span class="variable">$mysqld_pid_file_path</span>&quot;</span></span><br><span class="line">      <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">      <span class="comment"># Delete lock for RedHat / SuSE</span></span><br><span class="line">      <span class="keyword">if</span> <span class="built_in">test</span> -f <span class="string">&quot;<span class="variable">$lock_file_path</span>&quot;</span></span><br><span class="line">      <span class="keyword">then</span></span><br><span class="line">        rm -f <span class="string">&quot;<span class="variable">$lock_file_path</span>&quot;</span></span><br><span class="line">      <span class="keyword">fi</span></span><br><span class="line">      <span class="built_in">exit</span> <span class="variable">$return_value</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      log_failure_msg <span class="string">&quot;MySQL server PID file could not be found!&quot;</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">    ;;</span><br><span class="line"></span><br><span class="line">  <span class="string">&#x27;restart&#x27;</span>)</span><br><span class="line">    <span class="comment"># Stop the service and regardless of whether it was</span></span><br><span class="line">    <span class="comment"># running or not, start it again.</span></span><br><span class="line">    <span class="keyword">if</span> <span class="variable">$0</span> stop  <span class="variable">$other_args</span>; <span class="keyword">then</span></span><br><span class="line">      <span class="variable">$0</span> start <span class="variable">$other_args</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      log_failure_msg <span class="string">&quot;Failed to stop running server, so refusing to try to start.&quot;</span></span><br><span class="line">      <span class="built_in">exit</span> 1</span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">    ;;</span><br><span class="line"></span><br><span class="line">  <span class="string">&#x27;reload&#x27;</span>|<span class="string">&#x27;force-reload&#x27;</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">test</span> -s <span class="string">&quot;<span class="variable">$mysqld_pid_file_path</span>&quot;</span> ; <span class="keyword">then</span></span><br><span class="line">      <span class="built_in">read</span> mysqld_pid &lt;  <span class="string">&quot;<span class="variable">$mysqld_pid_file_path</span>&quot;</span></span><br><span class="line">      <span class="built_in">kill</span> -HUP <span class="variable">$mysqld_pid</span> &amp;&amp; log_success_msg <span class="string">&quot;Reloading service MySQL&quot;</span></span><br><span class="line">      touch <span class="string">&quot;<span class="variable">$mysqld_pid_file_path</span>&quot;</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      log_failure_msg <span class="string">&quot;MySQL PID file could not be found!&quot;</span></span><br><span class="line">      <span class="built_in">exit</span> 1</span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">    ;;</span><br><span class="line">  <span class="string">&#x27;status&#x27;</span>)</span><br><span class="line">    <span class="comment"># First, check to see if pid file exists</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">test</span> -s <span class="string">&quot;<span class="variable">$mysqld_pid_file_path</span>&quot;</span> ; <span class="keyword">then</span> </span><br><span class="line">      <span class="built_in">read</span> mysqld_pid &lt; <span class="string">&quot;<span class="variable">$mysqld_pid_file_path</span>&quot;</span></span><br><span class="line">      <span class="keyword">if</span> <span class="built_in">kill</span> -0 <span class="variable">$mysqld_pid</span> 2&gt;/dev/null ; <span class="keyword">then</span> </span><br><span class="line">        log_success_msg <span class="string">&quot;MySQL running (<span class="variable">$mysqld_pid</span>)&quot;</span></span><br><span class="line">        <span class="built_in">exit</span> 0</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">        log_failure_msg <span class="string">&quot;MySQL is not running, but PID file exists&quot;</span></span><br><span class="line">        <span class="built_in">exit</span> 1</span><br><span class="line">      <span class="keyword">fi</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      <span class="comment"># Try to find appropriate mysqld process</span></span><br><span class="line">      mysqld_pid=`@PIDOF@ <span class="variable">$libexecdir</span>/mysqld`</span><br><span class="line"></span><br><span class="line">      <span class="comment"># test if multiple pids exist</span></span><br><span class="line">      pid_count=`<span class="built_in">echo</span> <span class="variable">$mysqld_pid</span> | wc -w`</span><br><span class="line">      <span class="keyword">if</span> <span class="built_in">test</span> <span class="variable">$pid_count</span> -gt 1 ; <span class="keyword">then</span></span><br><span class="line">        log_failure_msg <span class="string">&quot;Multiple MySQL running but PID file could not be found (<span class="variable">$mysqld_pid</span>)&quot;</span></span><br><span class="line">        <span class="built_in">exit</span> 5</span><br><span class="line">      <span class="keyword">elif</span> <span class="built_in">test</span> -z <span class="variable">$mysqld_pid</span> ; <span class="keyword">then</span> </span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">test</span> -f <span class="string">&quot;<span class="variable">$lock_file_path</span>&quot;</span> ; <span class="keyword">then</span> </span><br><span class="line">          log_failure_msg <span class="string">&quot;MySQL is not running, but lock file (<span class="variable">$lock_file_path</span>) exists&quot;</span></span><br><span class="line">          <span class="built_in">exit</span> 2</span><br><span class="line">        <span class="keyword">fi</span> </span><br><span class="line">        log_failure_msg <span class="string">&quot;MySQL is not running&quot;</span></span><br><span class="line">        <span class="built_in">exit</span> 3</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">        log_failure_msg <span class="string">&quot;MySQL is running but PID file could not be found&quot;</span></span><br><span class="line">        <span class="built_in">exit</span> 4</span><br><span class="line">      <span class="keyword">fi</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">    ;;</span><br><span class="line">    *)</span><br><span class="line">      <span class="comment"># usage</span></span><br><span class="line">      basename=`basename <span class="string">&quot;<span class="variable">$0</span>&quot;</span>`</span><br><span class="line">      <span class="built_in">echo</span> <span class="string">&quot;Usage: <span class="variable">$basename</span>  &#123;start|stop|restart|reload|force-reload|status&#125;  [ MySQL server options ]&quot;</span></span><br><span class="line">      <span class="built_in">exit</span> 1</span><br><span class="line">    ;;</span><br><span class="line"><span class="keyword">esac</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">exit</span> 0</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/WSL/" rel="tag"># WSL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/07/Leetcode/Leetcode%20763%20Partition%20Labels/" rel="prev" title="Leetcode 763 Partition Labels">
+      <i class="fa fa-chevron-left"></i> Leetcode 763 Partition Labels
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/10/Leetcode/Leetcode%20494%20Target%20Sum/" rel="next" title="Leetcode 494 Target Sum">
+      Leetcode 494 Target Sum <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">2.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%A5%E5%9D%91"><span class="nav-number">3.</span> <span class="nav-text">入坑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%84%B1%E5%9D%91"><span class="nav-number">4.</span> <span class="nav-text">脱坑</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Haiyang Yu"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Haiyang Yu</p>
+  <div class="site-description" itemprop="description">Be Curious about Everything</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">314</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/HaiyangYu1999" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;HaiyangYu1999" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1572808459@qq.com" title="E-Mail → mailto:1572808459@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/HaiyangYu1999" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;HaiyangYu1999" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://stackoverflow.com/users/14220101/haiyangyu" title="StackOverflow → https:&#x2F;&#x2F;stackoverflow.com&#x2F;users&#x2F;14220101&#x2F;haiyangyu" rel="noopener" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>StackOverflow</a>
+      </span>
+  </div>
+
+
+  
+
+  <div class="">
+    
+
+    <div class="">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">rss</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <!--music player-->
+        
+        <div>
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="210" height="110" src="//music.163.com/outchain/player?type=2&id=32320820&auto=0&height=66"></iframe>
+        </div>
+        
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Haiyang Yu</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">794k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">12:02</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'hxe9hqY7qITFtGDgNC1b3MTb-MdYXbMMI',
+      appKey     : 'guH4jp25sS3mDPzFPcRSNvdJ',
+      placeholder: "快来评论一下吧~",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+<canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+<script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+<script type="text/javascript" src="/js/fireworks.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"left","width":200,"height":350},"mobile":{"show":true},"log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
