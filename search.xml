@@ -10678,8 +10678,8 @@
       </tags>
   </entry>
   <entry>
-    <title></title>
-    <url>/1970/01/01/%E9%9D%A2%E7%BB%8F/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E4%B9%A0%E7%94%9F%E4%BA%8C%E9%9D%A2%E9%9D%A2%E7%BB%8F/</url>
+    <title>阿里巴巴数据开发实习生二面面经</title>
+    <url>/2021/04/24/%E9%9D%A2%E7%BB%8F/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E4%B9%A0%E7%94%9F%E4%BA%8C%E9%9D%A2%E9%9D%A2%E7%BB%8F/</url>
     <content><![CDATA[<p>首先面试官竟然先自我介绍起来了, 介绍了组内的业务和技术栈</p>
 <p>随后问了些实习的问题</p>
 <p>给你一整年的关键词的数据, 关键词可以被视作字符串, 一天大概50亿条. 存储在100台机器上, 求top100频率最高的字符串</p>
@@ -10694,10 +10694,16 @@
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Heap</span></span>&#123;</span><br><span class="line">      Pair[] values = <span class="keyword">new</span> Pair[n];</span><br><span class="line">    <span class="keyword">int</span> size = <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">push</span><span class="params">(Pair pair)</span></span>&#123;</span><br><span class="line">        values[++size] = pair;</span><br><span class="line">        <span class="keyword">int</span> i = size;</span><br><span class="line">        Pair parent = values[i/<span class="number">2</span>];</span><br><span class="line">        <span class="keyword">while</span>(i / <span class="number">2</span> &gt; <span class="number">0</span>)&#123;</span><br><span class="line">            <span class="keyword">if</span>(values[i].second &lt; parent.second)&#123;</span><br><span class="line">                Pair tmp = values[i/<span class="number">2</span>];</span><br><span class="line">                value[i/<span class="number">2</span>] = value[i];</span><br><span class="line">                value[i] = tmp;</span><br><span class="line">                i = i / <span class="number">2</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="function">Pair <span class="title">pop</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Pair ret = values[<span class="number">1</span>];</span><br><span class="line">        values[<span class="number">1</span>] = values[size];</span><br><span class="line">        <span class="comment">//values[size] = null 这里忘记清空了</span></span><br><span class="line">        --size;</span><br><span class="line">        <span class="keyword">int</span> i = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span>(i * <span class="number">2</span> &lt;= size)&#123;</span><br><span class="line">            Pair left = values[i * <span class="number">2</span>];</span><br><span class="line">            Pair right = values[i * <span class="number">2</span> + <span class="number">1</span>];</span><br><span class="line">            <span class="keyword">if</span>(right == <span class="keyword">null</span>)&#123;</span><br><span class="line">                <span class="keyword">if</span>(values[i].second &gt; left.second)&#123;</span><br><span class="line">                    Pair tmp = values[i];</span><br><span class="line">                    values[i] = left;</span><br><span class="line">                    values[i * <span class="number">2</span>] = tmp;</span><br><span class="line">                    <span class="comment">// i = i * 2  这里忘记更新i了</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span>&#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">if</span>(values[i].second &gt; Math.min(left.second, right.second))&#123;</span><br><span class="line">                    <span class="keyword">if</span>(left.second &gt; right.second)&#123;</span><br><span class="line">                        Pair tmp = values[i];</span><br><span class="line">                        values[i] = right;</span><br><span class="line">                        values[i * <span class="number">2</span> + <span class="number">1</span>] = tmp;</span><br><span class="line">                        <span class="comment">// i = i * 2 + 1  这里忘记更新i了</span></span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">else</span>&#123;</span><br><span class="line">                        Pair tmp = values[i];</span><br><span class="line">                        values[i] = left;</span><br><span class="line">                        values[i * <span class="number">2</span>] = tmp;</span><br><span class="line">                        <span class="comment">// i = i * 2  这里忘记更新i了</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span>&#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function">List&lt;Pair&gt; <span class="title">topK</span><span class="params">(List&lt;Pair&gt; pairs, <span class="keyword">int</span> k)</span></span>&#123;</span><br><span class="line">  Heap heap = makeHeap();</span><br><span class="line">  <span class="keyword">for</span>(Pair pair : pairs)&#123;</span><br><span class="line">    <span class="keyword">if</span>(heap.size &lt; k)&#123;</span><br><span class="line">      heap.push(pair);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">      Pair top = heap.top();</span><br><span class="line">      <span class="keyword">if</span>(top.second &lt; pair.second)&#123;</span><br><span class="line">        heap.pop();</span><br><span class="line">        heap.push(pair);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> ArrayList&lt;Pair&gt;(heap);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 ]]></content>
+      <categories>
+        <category>面经</category>
+      </categories>
+      <tags>
+        <tag>面经</tag>
+      </tags>
   </entry>
   <entry>
-    <title></title>
-    <url>/1970/01/01/%E9%9D%A2%E7%BB%8F/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E4%B9%A0%E7%94%9F%E4%B8%80%E9%9D%A2%E9%9D%A2%E7%BB%8F/</url>
+    <title>阿里巴巴数据开发实习生一面面经</title>
+    <url>/2021/04/20/%E9%9D%A2%E7%BB%8F/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E4%B9%A0%E7%94%9F%E4%B8%80%E9%9D%A2%E9%9D%A2%E7%BB%8F/</url>
     <content><![CDATA[<p>首先还是自我介绍, 介绍了项目和实习</p>
 <p>你们这个实习数据量多大? 只负责的离线计算吗? 有没有做实时计算?</p>
 <p>说一下HashMap和Hashtable区别?</p>
@@ -10722,6 +10728,12 @@
 
 
 ]]></content>
+      <categories>
+        <category>面经</category>
+      </categories>
+      <tags>
+        <tag>面经</tag>
+      </tags>
   </entry>
   <entry>
     <title>n数码问题的A*算法(java实现)</title>
@@ -10825,8 +10837,8 @@
     <content><![CDATA[]]></content>
   </entry>
   <entry>
-    <title></title>
-    <url>/1970/01/01/%E9%9D%A2%E7%BB%8F/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E4%B9%A0%E7%94%9F%E4%B8%89%E9%9D%A2%E9%9D%A2%E7%BB%8F/</url>
+    <title>阿里巴巴数据开发实习生三面面经</title>
+    <url>/2021/05/06/%E9%9D%A2%E7%BB%8F/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E4%B9%A0%E7%94%9F%E4%B8%89%E9%9D%A2%E9%9D%A2%E7%BB%8F/</url>
     <content><![CDATA[<p>自我介绍</p>
 <p>N个文件, 每个文件有序, 怎么合并成一个整体有序的文件? 时间空间复杂度是多少? (外部排序)</p>
 <p>如何设计一个整数压缩算法? 一个整数数组, 用尽可能小的空间存放, 并且可以压缩完之后可以还原. (这个应该有专门的整数压缩算法, 但我不知道, 用之前学的霍夫曼编码构造了一下)</p>
@@ -10837,5 +10849,11 @@
 <figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Queue</span>&#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="keyword">int</span> values[];</span><br><span class="line">  <span class="keyword">int</span> <span class="built_in">begin</span>;</span><br><span class="line">  <span class="keyword">int</span> <span class="built_in">end</span>;</span><br><span class="line">  <span class="keyword">int</span> <span class="built_in">size</span>;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  Queue(<span class="keyword">int</span> n)&#123;</span><br><span class="line">    ++n;</span><br><span class="line">    values = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">    <span class="built_in">size</span> = n;</span><br><span class="line">    <span class="built_in">begin</span> = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">end</span> = <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  ~Queue()&#123;</span><br><span class="line">    <span class="keyword">delete</span>[] values;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">push_back</span><span class="params">(<span class="keyword">int</span> a)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">end</span> == (<span class="built_in">begin</span> - <span class="number">1</span>) % <span class="built_in">size</span>)&#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">&quot;FullQueue&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">      <span class="built_in">end</span> = (<span class="built_in">end</span> + <span class="number">1</span>) % <span class="built_in">size</span>;</span><br><span class="line">      values[<span class="built_in">end</span>] = a;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">int</span> <span class="title">pop_front</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">end</span> == <span class="built_in">begin</span>)&#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">&quot;EmptyQueue&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">      <span class="keyword">int</span> ret = values[<span class="built_in">begin</span>];</span><br><span class="line">      <span class="built_in">begin</span> = (<span class="built_in">begin</span> + <span class="number">1</span>) % <span class="built_in">size</span>;</span><br><span class="line">      <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 ]]></content>
+      <categories>
+        <category>面经</category>
+      </categories>
+      <tags>
+        <tag>面经</tag>
+      </tags>
   </entry>
 </search>

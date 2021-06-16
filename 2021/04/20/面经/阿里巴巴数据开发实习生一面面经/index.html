@@ -20,17 +20,20 @@
     var CONFIG = {"hostname":"yoursite","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Be Curious about Everything">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Haiyang Yu&#39;s Blog">
-<meta property="og:url" content="https://yoursite/archives/1970/page/5/index.html">
+  <meta name="description" content="首先还是自我介绍, 介绍了项目和实习 你们这个实习数据量多大? 只负责的离线计算吗? 有没有做实时计算? 说一下HashMap和Hashtable区别? 介绍下java里优先队列的实现? 说一下使用线程池的好处? 在你的项目里怎么确定的线程池的参数? 你的项目里提到爬虫, 爬取的过程中怎么避免爬取重复的URL的问题呢? 用集合来存储 如果是定时爬取的话, 怎样设置集合中URL的过期时间呢?  了解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="阿里巴巴数据开发实习生一面面经">
+<meta property="og:url" content="https://yoursite/2021/04/20/%E9%9D%A2%E7%BB%8F/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E4%B9%A0%E7%94%9F%E4%B8%80%E9%9D%A2%E9%9D%A2%E7%BB%8F/index.html">
 <meta property="og:site_name" content="Haiyang Yu&#39;s Blog">
-<meta property="og:description" content="Be Curious about Everything">
+<meta property="og:description" content="首先还是自我介绍, 介绍了项目和实习 你们这个实习数据量多大? 只负责的离线计算吗? 有没有做实时计算? 说一下HashMap和Hashtable区别? 介绍下java里优先队列的实现? 说一下使用线程池的好处? 在你的项目里怎么确定的线程池的参数? 你的项目里提到爬虫, 爬取的过程中怎么避免爬取重复的URL的问题呢? 用集合来存储 如果是定时爬取的话, 怎样设置集合中URL的过期时间呢?  了解">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-04-20T15:33:55.000Z">
+<meta property="article:modified_time" content="2021-06-16T15:11:10.945Z">
 <meta property="article:author" content="Haiyang Yu">
+<meta property="article:tag" content="面经">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://yoursite/archives/1970/page/5/">
+<link rel="canonical" href="https://yoursite/2021/04/20/%E9%9D%A2%E7%BB%8F/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E4%B9%A0%E7%94%9F%E4%B8%80%E9%9D%A2%E9%9D%A2%E7%BB%8F/">
 
 
 <script id="page-configurations">
@@ -38,12 +41,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>归档 | Haiyang Yu's Blog</title>
+  <title>阿里巴巴数据开发实习生一面面经 | Haiyang Yu's Blog</title>
   
 
 
@@ -187,97 +190,157 @@
         <div class="content-wrap">
           
 
-          <div class="content archive">
+          <div class="content post posts-expand">
             
 
+    
   
   
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://yoursite/2021/04/20/%E9%9D%A2%E7%BB%8F/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E4%B9%A0%E7%94%9F%E4%B8%80%E9%9D%A2%E9%9D%A2%E7%BB%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Haiyang Yu">
+      <meta itemprop="description" content="Be Curious about Everything">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Haiyang Yu's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          阿里巴巴数据开发实习生一面面经
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-20 23:33:55" itemprop="dateCreated datePublished" datetime="2021-04-20T23:33:55+08:00">2021-04-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-16 23:11:10" itemprop="dateModified" datetime="2021-06-16T23:11:10+08:00">2021-06-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%A2%E7%BB%8F/" itemprop="url" rel="index"><span itemprop="name">面经</span></a>
+                </span>
+            </span>
+
+          
   
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        
-        <span class="collection-header">太棒了! 目前共计 316 篇日志。 继续努力。</span>
-      </div>
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/04/20/%E9%9D%A2%E7%BB%8F/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E4%B9%A0%E7%94%9F%E4%B8%80%E9%9D%A2%E9%9D%A2%E7%BB%8F/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/04/20/%E9%9D%A2%E7%BB%8F/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E4%B9%A0%E7%94%9F%E4%B8%80%E9%9D%A2%E9%9D%A2%E7%BB%8F/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
+        <p>首先还是自我介绍, 介绍了项目和实习</p>
+<p>你们这个实习数据量多大? 只负责的离线计算吗? 有没有做实时计算?</p>
+<p>说一下HashMap和Hashtable区别?</p>
+<p>介绍下java里优先队列的实现?</p>
+<p>说一下使用线程池的好处?</p>
+<p>在你的项目里怎么确定的线程池的参数?</p>
+<p>你的项目里提到爬虫, 爬取的过程中怎么避免爬取重复的URL的问题呢? 用集合来存储</p>
+<p>如果是定时爬取的话, 怎样设置集合中URL的过期时间呢? </p>
+<p>了解redis删除过期的key的原理吗? 不了解, 蒙了一个不知道对不对</p>
+<p>降价通知功能中每个股票对应的list是遍历一遍来扫描的吗? </p>
+<p>为什么订阅后只发布一次通知, 如果用户想自定义发送通知的次数和步长, 和过期时间, 你应该怎么设计? (这个太难了, <strong>不得不说阿里的面试官水平是真的高, 几分钟的交流就已经了解我做的项目的原理了, 并且发现了不足的地方</strong>)</p>
+<p>jvm有了解吗? 讲讲类加载的机制吧</p>
+<p>说一下java进程的几个状态?</p>
+<p>说一下java多线程的关键字?</p>
+<p>说一下synchronized原理?</p>
+<p>写个题吧</p>
+<a id="more"></a>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+<p>这个题是真的简单, 感觉和three sum一样, 甚至还更简单一些</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">有序数组n,输入k,找出满足两个数相加=k的所有序列对</span><br><span class="line">List&lt;List&lt;Integer&gt;&gt; sumK(<span class="keyword">int</span>[] n, <span class="keyword">int</span> k)&#123;</span><br><span class="line">    List&lt;List&lt;Integer&gt;&gt; ans = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">if</span>(n == <span class="keyword">null</span> || n.length &lt; <span class="number">2</span>)&#123;</span><br><span class="line">         <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> left = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> right = n.length - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(left &lt; right)&#123;</span><br><span class="line">        <span class="keyword">while</span>(left &gt; <span class="number">0</span> &amp;&amp; left &lt; n.length &amp;&amp; n[left] == n[left-<span class="number">1</span>])&#123;</span><br><span class="line">            ++left;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span>(right &gt;= <span class="number">0</span> &amp;&amp; right &lt; n.length - <span class="number">1</span> &amp;&amp; n[right] == n[right+<span class="number">1</span>])&#123;</span><br><span class="line">            --right;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(left &gt;= right)&#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> tmp = n[left] + n[right];</span><br><span class="line">        <span class="keyword">if</span>(tmp == k)&#123;</span><br><span class="line">            ans.add(Arrays.toList(<span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">2</span>]&#123;n[left], n[right]&#125;));</span><br><span class="line">            <span class="comment">//这里应该是 ans.add(new ArrayList&lt;Integer&gt;(Arrays.asList(n[left], n[right])));</span></span><br><span class="line">            ++left;</span><br><span class="line">            --right;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(tmp &gt; k)&#123;</span><br><span class="line">            --right;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span>&#123;</span><br><span class="line">            ++left;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="1970-01-01T08:00:00+08:00"
-              content="1970-01-01">
-          01-01
-        </time>
-      </div>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/1970/01/01/%E9%9D%A2%E7%BB%8F/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E4%B9%A0%E7%94%9F%E4%BA%8C%E9%9D%A2%E9%9D%A2%E7%BB%8F/" itemprop="url">
-            <span itemprop="name">未命名</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="1970-01-01T08:00:00+08:00"
-              content="1970-01-01">
-          01-01
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/1970/01/01/%E9%9D%A2%E7%BB%8F/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E4%B9%A0%E7%94%9F%E4%B8%80%E9%9D%A2%E9%9D%A2%E7%BB%8F/" itemprop="url">
-            <span itemprop="name">未命名</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="1970-01-01T08:00:00+08:00"
-              content="1970-01-01">
-          01-01
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/1970/01/01/%E9%9D%A2%E7%BB%8F/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E4%B9%A0%E7%94%9F%E4%B8%89%E9%9D%A2%E9%9D%A2%E7%BB%8F/" itemprop="url">
-            <span itemprop="name">未命名</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
 
 
     </div>
-  </div>
-  
-  
-  
 
+    
+    
+    
+
+      
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%9D%A2%E7%BB%8F/" rel="tag"># 面经</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/19/%E9%9D%A2%E7%BB%8F/%E7%BE%8E%E5%9B%A2%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E4%B9%A0%E7%94%9F%E4%B8%89%E9%9D%A2%E9%9D%A2%E7%BB%8F/" rel="prev" title="美团数据开发实习生二面面经">
+      <i class="fa fa-chevron-left"></i> 美团数据开发实习生二面面经
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/21/%E9%9D%A2%E7%BB%8F/%E4%BA%AC%E4%B8%9C%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E5%AE%9E%E4%B9%A0%E7%94%9F%E4%BA%8C%E9%9D%A2%E9%9D%A2%E7%BB%8F/" rel="next" title="京东数据开发实习生二面面经">
+      京东数据开发实习生二面面经 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
   
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/archives/1970/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/archives/1970/">1</a><span class="space">&hellip;</span><a class="page-number" href="/archives/1970/page/4/">4</a><span class="page-number current">5</span>
-  </nav>
+  
+  
 
 
 
           </div>
           
+    <div class="comments" id="valine-comments"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
